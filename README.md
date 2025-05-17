@@ -7,7 +7,7 @@ A medical AI agent that runs locally using Ollama with Llama 3.2, designed to as
 This project consists of two main components:
 
 1. **Hardware** (planned):
-   - Jetson Nano
+   - Rasbpberry Pi
    - Speakers
    - OLED screen
    - Temperature sensor

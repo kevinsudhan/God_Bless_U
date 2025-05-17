@@ -201,8 +201,6 @@
                                     <button type="button" class="btn btn-outline-primary lang-btn active" id="lang-en">English</button>
                                     <button type="button" class="btn btn-outline-primary lang-btn" id="lang-hi">Hindi</button>
                                     <button type="button" class="btn btn-outline-primary lang-btn" id="lang-ta">Tamil</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-te">Telugu</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-kn">Kannada</button>
                                 </div>
                             </div>
                         </div>
@@ -276,8 +274,6 @@
             const langEn = document.getElementById('lang-en');
             const langHi = document.getElementById('lang-hi');
             const langTa = document.getElementById('lang-ta');
-            const langTe = document.getElementById('lang-te');
-            const langKn = document.getElementById('lang-kn');
             
             // Set up language selection event listeners
             langEn.addEventListener('click', function() {
@@ -292,19 +288,11 @@
                 setLanguage('ta');
             });
             
-            langTe.addEventListener('click', function() {
-                setLanguage('te');
-            });
-            
-            langKn.addEventListener('click', function() {
-                setLanguage('kn');
-            });
-            
             function setLanguage(lang) {
                 currentLanguage = lang;
                 
                 // Update UI
-                [langEn, langHi, langTa, langTe, langKn].forEach(btn => {
+                [langEn, langHi, langTa].forEach(btn => {
                     btn.classList.remove('active');
                 });
                 
@@ -314,10 +302,6 @@
                     langHi.classList.add('active');
                 } else if (lang === 'ta') {
                     langTa.classList.add('active');
-                } else if (lang === 'te') {
-                    langTe.classList.add('active');
-                } else if (lang === 'kn') {
-                    langKn.classList.add('active');
                 }
                 
                 console.log(`Language set to: ${lang}`);
@@ -326,9 +310,7 @@
                 const langNames = {
                     'en': 'English',
                     'hi': 'Hindi',
-                    'ta': 'Tamil',
-                    'te': 'Telugu',
-                    'kn': 'Kannada'
+                    'ta': 'Tamil'
                 };
                 
                 addMessageToChat(`Switched to ${langNames[lang]} language. Responses will now be in ${langNames[lang]}.`, 'bot');

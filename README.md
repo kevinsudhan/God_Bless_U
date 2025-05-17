@@ -35,9 +35,9 @@ This project consists of two main components:
 
 ### Installation
 
-1. Install the required Python packages:
+1. Install the required Python packages directly:
    ```
-   pip install -r requirements.txt
+   pip install flask requests pyttsx3 SpeechRecognition pyaudio flask-cors langchain langchain-community chroma-hnswlib chromadb sentence-transformers pydantic numpy pandas
    ```
 
 2. Create the MedBot model in Ollama:
@@ -83,6 +83,9 @@ This project consists of two main components:
 - Chat interface with the AI agent
 - Voice input using Whisper speech recognition
 - Text-to-speech output for spoken responses
+- Multilingual support for English, Hindi, and Tamil
+- Translation using AI4Bharat's IndicTrans2 models
+- Language-specific voice synthesis using Murf AI
 
 ## Technical Details
 

@@ -14,6 +14,7 @@ import io
 
 from simple_rag import get_rag_engine
 from medical_knowledge import get_medical_knowledge
+from multilingual import get_multilingual_support
 
 app = Flask(__name__)
 CORS(app)
@@ -93,6 +94,7 @@ def chat():
     user_role = data.get('role', 'patient')
     patient_id = data.get('patient_id', '')
     is_voice = data.get('is_voice', False)
+    language = data.get('language', 'en')
     
     patient_context = ""
     if patient_id in patients:
@@ -212,12 +214,37 @@ Patient: {user_message}"""
             result = response.json()
             response_text = result.get("response", "Sorry, I couldn't process your request.")
             
-            audio_file_path = text_to_speech(response_text)
-            with open(audio_file_path, "rb") as audio_file:
-                audio_data = audio_file.read()
+            # Process multilingual response if needed
+            if language != 'en':
+                print(f"Processing response in {language}")
+                multilingual = get_multilingual_support()
+                
+                # First translate the text
+                translated_text = multilingual.translate_text(response_text, "en", language)
+                print(f"Translated from English to {language}: {translated_text}")
+                
+                # Now generate audio from the translated text
+                audio_data = text_to_speech(translated_text, language)
                 audio_base64 = base64.b64encode(audio_data).decode('utf-8')
-            os.remove(audio_file_path)  
-            return jsonify({"response": response_text, "audio": audio_base64})
+                
+                # Return both original and translated text for display with the audio data
+                return jsonify({
+                    "response": translated_text,
+                    "original_text": response_text,
+                    "audio": audio_base64,
+                    "language": language
+                })
+            else:
+                # For English, just generate audio from the original text
+                audio_data = text_to_speech(response_text, language)
+                audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+                
+                # Standard English response
+                return jsonify({
+                    "response": response_text,
+                    "audio": audio_base64,
+                    "language": "en"
+                })
         else:
             return jsonify({"error": f"Ollama API error: {response.status_code}"}), 500
     
@@ -263,14 +290,74 @@ def speech_to_text():
         print(f"Error in speech-to-text: {str(e)}")
         return jsonify({"error": f"Speech processing error: {str(e)}"}), 500
 
-def text_to_speech(text):
-    temp_dir = tempfile.gettempdir()
-    output_path = os.path.join(temp_dir, "response.mp3")
-    
-    tts_engine.save_to_file(text, output_path)
-    tts_engine.runAndWait()
-    
-    return output_path
+def text_to_speech(text, language='en'):
+    # Google Text-to-Speech implementation
+    try:
+        from gtts import gTTS
+        import io
+        import base64
+        
+        print(f"Converting text to speech using Google TTS with language {language}...")
+        
+        # Map language code to Google TTS language code
+        tts_lang = 'en'
+        if language.startswith('ta'):
+            tts_lang = 'ta'
+        elif language.startswith('hi'):
+            tts_lang = 'hi'
+        elif language.startswith('es'):
+            tts_lang = 'es'
+        elif language.startswith('te'):
+            tts_lang = 'te'
+        elif language.startswith('kn'):
+            tts_lang = 'kn'
+        
+        # Create gTTS object and save to in-memory file
+        tts = gTTS(text=text, lang=tts_lang, slow=False)
+        
+        # Save to in-memory file object instead of disk
+        mp3_fp = io.BytesIO()
+        tts.write_to_fp(mp3_fp)
+        mp3_fp.seek(0)
+        
+        # Get binary data
+        audio_data = mp3_fp.read()
+        print(f"Successfully created Google TTS audio in {tts_lang} in memory")
+        
+        # Return the binary audio data directly
+        return audio_data
+    except Exception as e:
+        print(f"Google TTS error: {str(e)}")
+        
+        # Fallback to original TTS engine if Google TTS fails
+        try:
+            print(f"TTS error: {str(e)}. Using fallback method.")
+            import tempfile
+            import os
+            
+            # Create a BytesIO object for pyttsx3 output
+            temp_dir = tempfile.gettempdir()
+            output_path = os.path.join(temp_dir, "response.mp3")
+            
+            # Use pyttsx3 as fallback
+            tts_engine.save_to_file(text, output_path)
+            tts_engine.runAndWait()
+            
+            # Read the file into memory and return the binary data
+            with open(output_path, 'rb') as f:
+                audio_data = f.read()
+            
+            # Clean up the temporary file
+            try:
+                os.remove(output_path)
+            except:
+                pass
+                
+            return audio_data
+        except Exception as inner_e:
+            print(f"Even fallback TTS failed: {str(inner_e)}")
+            # Return empty binary data if everything fails
+            return b''
 
 print("Initializing RAG engine with patient data...")
 rag_engine = get_rag_engine(patients)

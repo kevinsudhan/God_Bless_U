@@ -1,0 +1,17 @@
+flask==2.3.3
+requests==2.31.0
+openai-whisper==20231117
+pyttsx3==2.90
+SpeechRecognition==3.10.0
+pyaudio==0.2.13
+flask-cors==4.0.0
+
+# RAG dependencies
+langchain==0.1.12
+langchain-community==0.0.29
+chroma-hnswlib==0.7.3
+chromadb==0.4.22
+sentence-transformers==2.5.1
+pydantic==2.6.4
+numpy==1.26.4
+pandas==2.2.1

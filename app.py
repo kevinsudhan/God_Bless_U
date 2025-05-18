@@ -492,4 +492,4 @@ print("RAG engine initialized!")
 
 if __name__ == "__main__":
     # Run app on all network interfaces so it's accessible on other devices
-    app.run(host='0.0.0.0', debug=True, port=5000)
+    app.run(host='0.0.0.0', debug=True, port=5001)

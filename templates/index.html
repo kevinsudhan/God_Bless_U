@@ -3,54 +3,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedBot - Hospital Room Assistant</title>
+    <title>WALL-E - Hospital Room Assistant</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <style>
+        :root {
+            --primary-green: #2E7D32;
+            --light-green: #4CAF50;
+            --dark-green: #1B5E20;
+            --accent-green: #81C784;
+            --gradient-start: #43A047;
+            --gradient-mid: #2E7D32;
+            --gradient-end: #1B5E20;
+            --gradient-accent: #00C853;
+            --text-light: #FFFFFF;
+            --text-dark: #263238;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --chat-bg: rgba(245, 245, 245, 0.9);
+            --user-msg-bg: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+            --bot-msg-bg: rgba(255, 255, 255, 0.95);
+            --border-radius: 16px;
+            --shadow-sm: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-md: 0 6px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        html, body {
+            height: 100%;
+        }
+        
         body {
-            background-color: #f5f8fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 20px 0;
+            position: relative;
+            overflow-x: hidden;
         }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50% }
+            50% { background-position: 100% 50% }
+            100% { background-position: 0% 50% }
+        }
+        
         .container {
-            max-width: 1200px;
+            max-width: 600px; /* Portrait orientation */
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
+        
+        .app-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .app-title {
+            color: var(--text-light);
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .app-subtitle {
+            color: var(--text-light);
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card-header {
+            background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+            color: var(--text-light);
+            font-weight: 600;
+            border: none;
+            padding: 15px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+            transform: rotate(30deg);
+            animation: shine 8s infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
         .chat-container {
             height: 400px;
             overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 8px;
             padding: 15px;
-            background-color: white;
+            background-color: var(--chat-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
         }
+        
         .message {
             margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 18px;
+            padding: 12px 18px;
+            border-radius: var(--border-radius);
             max-width: 80%;
             position: relative;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease;
         }
+        
+        .message:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
         .user-message {
-            background-color: #e3f2fd;
+            background: var(--user-msg-bg);
             margin-left: auto;
-            border-bottom-right-radius: 5px;
+            color: var(--dark-green);
+            border-bottom-right-radius: 4px;
+            animation: fadeInRight 0.5s ease;
         }
+        
         .bot-message {
-            background-color: #f1f1f1;
+            background-color: var(--bot-msg-bg);
             margin-right: auto;
-            border-bottom-left-radius: 5px;
+            border-bottom-left-radius: 4px;
+            animation: fadeInLeft 0.5s ease;
         }
-        .role-btn {
-            width: 120px;
-            margin: 0 10px;
+        
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
+        
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
         .avatar {
-            width: 250px;
-            height: 250px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             overflow: hidden;
-            margin: 0 auto 20px;
-            border: 5px solid #e3f2fd;
+            margin: 0 auto 15px;
+            border: 4px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(45deg, var(--gradient-start), var(--gradient-accent)) border-box;
+            box-shadow: var(--shadow-lg);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(66, 179, 104, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(66, 179, 104, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(66, 179, 104, 0); }
+        }
+        
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--gradient-start), var(--gradient-mid));
+            border: none;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background: linear-gradient(45deg, var(--gradient-mid), var(--gradient-end));
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary.active {
+            background: linear-gradient(45deg, var(--gradient-start), var(--gradient-mid));
+            border-color: transparent;
+            color: white;
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-2px);
+        }
+        
+        .nav-pills .nav-link {
+            border-radius: 30px;
+            padding: 8px 20px;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-pills .nav-link.active {
+            background: linear-gradient(45deg, var(--gradient-start), var(--gradient-mid));
+            box-shadow: var(--shadow-md);
+        }
+        
+        .nav-pills .nav-link:hover:not(.active) {
+            background: rgba(66, 179, 104, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+        }
+        
+        .vital-sign {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .vital-sign:last-child {
+            border-bottom: none;
+        }
+        
+        .role-btn, .lang-btn {
+            margin: 0 5px;
+            border-radius: 20px;
+            padding: 6px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .language-selection {
+            margin-top: 15px;
+        }
+        
+        .language-selection .btn-group {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .language-selection .btn {
+            margin-bottom: 5px;
+        }
+        
+        #recordingStatus .badge {
+            background-color: #f44336;
+            padding: 5px 10px;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-green);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .avatar {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .chat-container {
+                height: 350px;
+            }
+        }
+        
+        /* Sphere Animation Styles */
+        .sphere-container {
+            height: 300px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            perspective: 800px;
+        }
+        
+        .sphere {
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle at 65px 65px, var(--accent-green), var(--dark-green));
+            border-radius: 50%;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: var(--shadow-lg), 0 0 25px rgba(66, 179, 104, 0.5);
+            animation: float 5s ease-in-out infinite;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .sphere.pulse {
+            animation: pulse 0.5s ease;
+        }
+        
+        .sphere.talking {
+            animation: talking 2s ease-in-out;
+        }
+        
+        @keyframes talking {
+            0% { transform: scale(1); filter: brightness(1); }
+            25% { transform: scale(1.1); filter: brightness(1.2); }
+            50% { transform: scale(1); filter: brightness(1); }
+            75% { transform: scale(1.05); filter: brightness(1.1); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        
+        .sphere::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.4), transparent);
+            pointer-events: none;
+        }
+        
+        .sphere.pulse {
+            animation: spherePulse 2s infinite alternate;
+        }
+        
+        .sphere.speak {
+            animation: sphereSpeak 1.5s infinite;
+        }
+        
+        @keyframes spherePulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(66, 179, 104, 0.6);
+            }
+            100% {
+                transform: scale(1.1);
+                box-shadow: 0 0 40px rgba(66, 179, 104, 0.8);
+            }
+        }
+        
+        @keyframes sphereSpeak {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                box-shadow: 0 0 20px rgba(66, 179, 104, 0.6);
+            }
+            25% {
+                transform: scale(1.15) rotate(5deg);
+                box-shadow: 0 0 40px rgba(66, 179, 104, 0.8);
+            }
+            50% {
+                transform: scale(1.05) rotate(-5deg);
+                box-shadow: 0 0 30px rgba(66, 179, 104, 0.7);
+            }
+            75% {
+                transform: scale(1.1) rotate(3deg);
+                box-shadow: 0 0 35px rgba(66, 179, 104, 0.75);
+            }
+        }
+        
+        .wave {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(66, 179, 104, 0.3);
+            transform: scale(0);
+            animation: waveAnimation 2s linear infinite;
+        }
+        
+        @keyframes waveAnimation {
+            0% {
+                opacity: 0.8;
+                transform: scale(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(3);
+            }
         }
         .avatar img {
             width: 100%;
@@ -102,83 +495,110 @@
     </style>
 </head>
 <body>
+    <div id="particles-js"></div>
     <div class="container mt-4">
-        <div class="row">
-            <div class="col-12 text-center mb-4">
-                <h1 class="display-4">MedBot</h1>
-                <p class="lead">Hospital Room Assistant</p>
-            </div>
+        <div class="app-header">
+            <h1 class="app-title">WALL-E</h1>
+            <p class="app-subtitle">Hospital Room Assistant</p>
         </div>
         
-        <div class="row">
-            <!-- Left Column - Patient Info & Vitals -->
-            <div class="col-md-4">
+        <!-- Navigation tabs -->
+        <ul class="nav nav-pills mb-4" id="mainNav" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="visual-tab" data-bs-toggle="tab" data-bs-target="#visualScreen" type="button" role="tab" aria-controls="visualScreen" aria-selected="true">
+                    <i class="bi bi-soundwave me-1"></i> Voice
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chatScreen" type="button" role="tab" aria-controls="chatScreen" aria-selected="false">
+                    <i class="bi bi-chat-dots-fill me-1"></i> Chat
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#patientDetails" type="button" role="tab" aria-controls="patientDetails" aria-selected="false">
+                    <i class="bi bi-person-vcard-fill me-1"></i> Patient Details
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Tab content -->
+        <div class="tab-content" id="mainTabContent">
+            <!-- VISUALIZATION SCREEN -->
+            <div class="tab-pane fade show active" id="visualScreen" role="tabpanel" aria-labelledby="visual-tab">
+                <!-- Visualization Interface Card -->
                 <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        Patient Information
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>WALL-E Voice Interface</span>
+                            <div class="form-group mb-0">
+                                <select class="form-select form-select-sm" id="patientSelectVisual" style="width: auto;">
+                                    {% for patient_id in patient_ids %}
+                                    <option value="{{ patient_id }}">{{ patient_id }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <div class="avatar">
-                            <img src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png" alt="Patient Avatar">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="patientSelect" class="form-label">Select Patient:</label>
-                            <select class="form-select" id="patientSelect">
-                                {% for patient_id in patient_ids %}
-                                <option value="{{ patient_id }}">{{ patient_id }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div id="patientInfo">
-                            <p><strong>Name:</strong> <span id="patientName">-</span></p>
-                            <p><strong>Age:</strong> <span id="patientAge">-</span></p>
-                            <p><strong>Diagnosis:</strong> <span id="patientDiagnosis">-</span></p>
-                            <p><strong>Admission Date:</strong> <span id="admissionDate">-</span></p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        Vital Signs
-                        <button id="refreshVitals" class="btn btn-sm btn-light float-end">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="vital-sign">
-                            <div class="d-flex justify-content-between">
-                                <span>Temperature:</span>
-                                <span id="temperature">-</span>
+                        <div class="mb-3 text-center">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-primary role-btn active" id="patientRoleVisual">Patient</button>
+                                <button type="button" class="btn btn-outline-primary role-btn" id="doctorRoleVisual">Doctor</button>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted" id="roleDescriptionVisual">Speaking as a patient</small>
+                            </div>
+                            <div class="mt-2" id="doctorInfoVisual" style="display: none;">
+                                <div class="alert alert-info" role="alert">
+                                    <small>As a doctor, you can ask about any patient in the database, not just the selected one.</small>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 language-selection">
+                                <span class="me-2">Language:</span>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-primary lang-btn active" id="lang-en-visual">English</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-hi-visual">Hindi</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-ta-visual">Tamil</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-te-visual">Telugu</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-kn-visual">Kannada</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="vital-sign">
-                            <div class="d-flex justify-content-between">
-                                <span>Heart Rate:</span>
-                                <span id="heartRate">-</span>
-                            </div>
+                        
+                        <div class="sphere-container" id="sphereContainer">
+                            <div class="sphere" id="animatedSphere"></div>
                         </div>
-                        <div class="vital-sign">
-                            <div class="d-flex justify-content-between">
-                                <span>Blood Pressure:</span>
-                                <span id="bloodPressure">-</span>
-                            </div>
+                        
+                        <div class="input-group mt-4">
+                            <input type="text" class="form-control" id="messageInputVisual" placeholder="Type your message here...">
+                            <button class="btn btn-primary" id="sendButtonVisual">Send</button>
+                            <button class="btn btn-outline-primary" id="voiceButtonVisual" title="Voice Input">
+                                <i class="bi bi-mic-fill"></i>
+                            </button>
                         </div>
-                        <div class="vital-sign">
-                            <div class="d-flex justify-content-between">
-                                <span>Oxygen Saturation:</span>
-                                <span id="oxygenSaturation">-</span>
-                            </div>
+                        <div class="mt-2 text-center" id="recordingStatusVisual" style="display: none;">
+                            <span class="badge bg-danger">Recording...</span>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Right Column - Chat Interface -->
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        MedBot Interface
+            <!-- CHAT SCREEN -->
+            <div class="tab-pane fade" id="chatScreen" role="tabpanel" aria-labelledby="chat-tab">
+                <!-- Chat Interface Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>WALL-E Chat</span>
+                            <div class="form-group mb-0">
+                                <select class="form-select form-select-sm" id="patientSelectMini" style="width: auto;">
+                                    {% for patient_id in patient_ids %}
+                                    <option value="{{ patient_id }}">{{ patient_id }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="mb-3 text-center">
@@ -209,7 +629,7 @@
                         
                         <div class="chat-container mb-3" id="chatContainer">
                             <div class="message bot-message">
-                                Hello! I'm MedBot, your hospital room assistant. How can I help you today?
+                                Hello! I'm WALL-E, your hospital room assistant. How can I help you today?
                             </div>
                         </div>
                         
@@ -225,9 +645,88 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- PATIENT DETAILS SCREEN -->
+            <div class="tab-pane fade" id="patientDetails" role="tabpanel" aria-labelledby="details-tab">
+                <!-- Patient Info Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Patient Information
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="avatar">
+                            <img src="https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png" alt="Patient Avatar">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="patientSelect" class="form-label">Select Patient:</label>
+                            <select class="form-select" id="patientSelect">
+                                {% for patient_id in patient_ids %}
+                                <option value="{{ patient_id }}">{{ patient_id }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="patientInfo" class="text-start">
+                            <p><strong>Name:</strong> <span id="patientName">-</span></p>
+                            <p><strong>Age:</strong> <span id="patientAge">-</span></p>
+                            <p><strong>Diagnosis:</strong> <span id="patientDiagnosis">-</span></p>
+                            <p><strong>Admission Date:</strong> <span id="admissionDate">-</span></p>
+                        </div>
+                    </div>
+                </div>
                 
-                <div class="card mt-3">
-                    <div class="card-header bg-primary text-white">
+                <!-- Vital Signs Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        Vital Signs
+                        <button id="refreshVitals" class="btn btn-sm btn-light float-end">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="vital-sign">
+                            <div class="d-flex justify-content-between">
+                                <span>Temperature:</span>
+                                <span id="temperature">-</span>
+                            </div>
+                        </div>
+                        <div class="vital-sign">
+                            <div class="d-flex justify-content-between">
+                                <span>Heart Rate:</span>
+                                <span id="heartRate">-</span>
+                            </div>
+                        </div>
+                        <div class="vital-sign">
+                            <div class="d-flex justify-content-between">
+                                <span>Blood Pressure:</span>
+                                <span id="bloodPressure">-</span>
+                            </div>
+                        </div>
+                        <div class="vital-sign">
+                            <div class="d-flex justify-content-between">
+                                <span>Oxygen Saturation:</span>
+                                <span id="oxygenSaturation">-</span>
+                            </div>
+                        </div>
+                        <div class="vital-sign mt-3">
+                            <div class="d-flex justify-content-between">
+                                <span><strong>Data Source:</strong></span>
+                                <span id="dataSource" class="badge bg-success">-</span>
+                            </div>
+                            <div id="lastUpdated" class="text-muted small text-end mt-1"></div>
+                        </div>
+                        <div id="conditionContainer" class="vital-sign mt-3" style="display: none;">
+                            <div class="d-flex justify-content-between">
+                                <span><strong>Condition:</strong></span>
+                                <span id="patientCondition" class="badge bg-info">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Medical History Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
                         Medical History
                     </div>
                     <div class="card-body">
@@ -237,8 +736,9 @@
                     </div>
                 </div>
                 
-                <div class="card mt-3">
-                    <div class="card-header bg-primary text-white">
+                <!-- Medications Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
                         Medications
                     </div>
                     <div class="card-body">
@@ -251,6 +751,8 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Audio context for voice recording
@@ -301,29 +803,16 @@
             });
             
             function setLanguage(lang) {
+                const prevLanguage = currentLanguage;
                 currentLanguage = lang;
                 
-                // Update UI
+                // Update UI for regular chat interface
                 [langEn, langHi, langTa, langTe, langKn].forEach(btn => {
                     btn.classList.remove('active');
                 });
                 
-                if (lang === 'en') {
-                    langEn.classList.add('active');
-                } else if (lang === 'hi') {
-                    langHi.classList.add('active');
-                } else if (lang === 'ta') {
-                    langTa.classList.add('active');
-                } else if (lang === 'te') {
-                    langTe.classList.add('active');
-                } else if (lang === 'kn') {
-                    langKn.classList.add('active');
-                }
-                
-                console.log(`Language set to: ${lang}`);
-                
-                // Add a message to the chat about language change
-                const langNames = {
+                // Language name mapping for display
+                const languageNames = {
                     'en': 'English',
                     'hi': 'Hindi',
                     'ta': 'Tamil',
@@ -331,11 +820,287 @@
                     'kn': 'Kannada'
                 };
                 
-                addMessageToChat(`Switched to ${langNames[lang]} language. Responses will now be in ${langNames[lang]}.`, 'bot');
+                // Set the correct button to active
+                if (lang === 'en') {
+                    langEn.classList.add('active');
+                    document.getElementById('lang-en-visual').classList.add('active');
+                } else if (lang === 'hi') {
+                    langHi.classList.add('active');
+                    document.getElementById('lang-hi-visual').classList.add('active');
+                } else if (lang === 'ta') {
+                    langTa.classList.add('active');
+                    document.getElementById('lang-ta-visual').classList.add('active');
+                } else if (lang === 'te') {
+                    langTe.classList.add('active');
+                    document.getElementById('lang-te-visual').classList.add('active');
+                } else if (lang === 'kn') {
+                    langKn.classList.add('active');
+                    document.getElementById('lang-kn-visual').classList.add('active');
+                }
+                
+                // Remove active class from all visual language buttons except the selected one
+                visualLangButtons.forEach(btn => {
+                    if (!btn.id.includes(lang)) {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                // Only show language change message if it's actually changing
+                if (prevLanguage !== lang) {
+                    // Show a system message in the chat about language change
+                    const languageName = languageNames[lang] || lang.toUpperCase();
+                    const systemMessage = document.createElement('div');
+                    systemMessage.classList.add('message', 'system-message');
+                    systemMessage.innerHTML = `<span class="badge bg-info">SYSTEM</span> Switched to <strong>${languageName}</strong> language`;
+                    
+                    // Add to both chat containers (visual and regular)
+                    chatContainer.appendChild(systemMessage.cloneNode(true));
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    
+                    // Also add to visual chat if it exists
+                    const visualChatContainer = document.querySelector('.visual-chat-container');
+                    if (visualChatContainer) {
+                        visualChatContainer.appendChild(systemMessage.cloneNode(true));
+                        visualChatContainer.scrollTop = visualChatContainer.scrollHeight;
+                    }
+                }
             }
+            
+            // Add event listeners for visual interface language buttons
+            document.getElementById('lang-en-visual').addEventListener('click', function() {
+                setLanguage('en');
+            });
+            
+            document.getElementById('lang-hi-visual').addEventListener('click', function() {
+                setLanguage('hi');
+            });
+            
+            document.getElementById('lang-ta-visual').addEventListener('click', function() {
+                setLanguage('ta');
+            });
+            
+            document.getElementById('lang-te-visual').addEventListener('click', function() {
+                setLanguage('te');
+            });
+            
+            document.getElementById('lang-kn-visual').addEventListener('click', function() {
+                setLanguage('kn');
+            });
             
             // Load initial patient data
             loadPatientData(currentPatientId);
+            
+            // Sync all patient selectors
+            document.getElementById('patientSelect').addEventListener('change', function() {
+                document.getElementById('patientSelectMini').value = this.value;
+                document.getElementById('patientSelectVisual').value = this.value;
+                currentPatientId = this.value;
+                loadPatientData(currentPatientId);
+            });
+            
+            document.getElementById('patientSelectMini').addEventListener('change', function() {
+                document.getElementById('patientSelect').value = this.value;
+                document.getElementById('patientSelectVisual').value = this.value;
+                currentPatientId = this.value;
+                loadPatientData(currentPatientId);
+            });
+            
+            document.getElementById('patientSelectVisual').addEventListener('change', function() {
+                document.getElementById('patientSelect').value = this.value;
+                document.getElementById('patientSelectMini').value = this.value;
+                currentPatientId = this.value;
+                loadPatientData(currentPatientId);
+            });
+            
+            // Tab navigation event listeners
+            document.getElementById('details-tab').addEventListener('click', function() {
+                // Ensure patient data is refreshed when switching to details tab
+                updateVitalSigns(currentPatientId);
+            });
+            
+            // Sphere animation logic
+            const animatedSphere = document.getElementById('animatedSphere');
+            animatedSphere.classList.add('pulse');
+            
+            // Add wave animation around the sphere
+            function createWave() {
+                const sphereContainer = document.getElementById('sphereContainer');
+                const wave = document.createElement('div');
+                wave.classList.add('wave');
+                wave.style.width = '150px';
+                wave.style.height = '150px';
+                sphereContainer.appendChild(wave);
+                
+                // Remove the wave after animation completes
+                setTimeout(() => {
+                    wave.remove();
+                }, 2000);
+            }
+            
+            // Create waves at regular intervals
+            setInterval(createWave, 2000);
+            
+            // Visual interface controls
+            document.getElementById('doctorRoleVisual').addEventListener('click', function() {
+                document.getElementById('patientRoleVisual').classList.remove('active');
+                this.classList.add('active');
+                document.getElementById('roleDescriptionVisual').textContent = 'Speaking as a doctor';
+                document.getElementById('doctorInfoVisual').style.display = 'block';
+                document.getElementById('doctorRole').click();
+                isDoctor = true;
+            });
+            
+            document.getElementById('patientRoleVisual').addEventListener('click', function() {
+                document.getElementById('doctorRoleVisual').classList.remove('active');
+                this.classList.add('active');
+                document.getElementById('roleDescriptionVisual').textContent = 'Speaking as a patient';
+                document.getElementById('doctorInfoVisual').style.display = 'none';
+                document.getElementById('patientRole').click();
+                isDoctor = false;
+            });
+            
+            // Visual interface message handling
+            document.getElementById('sendButtonVisual').addEventListener('click', function() {
+                const messageInput = document.getElementById('messageInputVisual');
+                if (messageInput.value.trim() !== '') {
+                    // Animate sphere when sending message
+                    const sphere = document.getElementById('animatedSphere');
+                    sphere.classList.remove('pulse');
+                    sphere.classList.add('speak');
+                    
+                    // Send message using the same function as the chat tab
+                    const chatMessageInput = document.getElementById('messageInput');
+                    chatMessageInput.value = messageInput.value;
+                    sendMessage();
+                    messageInput.value = '';
+                    
+                    // Return to pulse animation after a delay
+                    setTimeout(() => {
+                        sphere.classList.remove('speak');
+                        sphere.classList.add('pulse');
+                    }, 500);
+                }
+            });
+            
+            // Voice button in visualization screen
+            document.getElementById('voiceButtonVisual').addEventListener('click', function() {
+                // Use the same toggle recording function as in chat screen
+                document.getElementById('voiceButton').click();
+                // Toggle visibility of recording status on visualization screen
+                const recordingStatusVisual = document.getElementById('recordingStatusVisual');
+                if (recordingStatusVisual.style.display === 'none') {
+                    recordingStatusVisual.style.display = 'block';
+                } else {
+                    recordingStatusVisual.style.display = 'none';
+                }
+            });
+            
+            // Initialize particles.js
+            particlesJS('particles-js', {
+                particles: {
+                    number: {
+                        value: 80,
+                        density: {
+                            enable: true,
+                            value_area: 800
+                        }
+                    },
+                    color: {
+                        value: '#ffffff'
+                    },
+                    shape: {
+                        type: 'circle',
+                        stroke: {
+                            width: 0,
+                            color: '#000000'
+                        },
+                        polygon: {
+                            nb_sides: 5
+                        }
+                    },
+                    opacity: {
+                        value: 0.3,
+                        random: false,
+                        anim: {
+                            enable: false,
+                            speed: 1,
+                            opacity_min: 0.1,
+                            sync: false
+                        }
+                    },
+                    size: {
+                        value: 3,
+                        random: true,
+                        anim: {
+                            enable: false,
+                            speed: 40,
+                            size_min: 0.1,
+                            sync: false
+                        }
+                    },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: '#ffffff',
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 2,
+                        direction: 'none',
+                        random: false,
+                        straight: false,
+                        out_mode: 'out',
+                        bounce: false,
+                        attract: {
+                            enable: false,
+                            rotateX: 600,
+                            rotateY: 1200
+                        }
+                    }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: {
+                            enable: true,
+                            mode: 'grab'
+                        },
+                        onclick: {
+                            enable: true,
+                            mode: 'push'
+                        },
+                        resize: true
+                    },
+                    modes: {
+                        grab: {
+                            distance: 140,
+                            line_linked: {
+                                opacity: 1
+                            }
+                        },
+                        bubble: {
+                            distance: 400,
+                            size: 40,
+                            duration: 2,
+                            opacity: 8,
+                            speed: 3
+                        },
+                        repulse: {
+                            distance: 200,
+                            duration: 0.4
+                        },
+                        push: {
+                            particles_nb: 4
+                        },
+                        remove: {
+                            particles_nb: 2
+                        }
+                    }
+                },
+                retina_detect: true
+            });
             
             // Event listeners
             patientSelect.addEventListener('change', function() {
@@ -463,6 +1228,17 @@
             function handleBotResponse(data) {
                 // Handle multilingual responses
                 if (data.language && data.language !== 'en' && data.original_text) {
+                    // Language name mapping for display
+                    const languageNames = {
+                        'hi': 'Hindi',
+                        'ta': 'Tamil',
+                        'te': 'Telugu',
+                        'kn': 'Kannada',
+                        'ml': 'Malayalam'
+                    };
+                    
+                    const languageName = languageNames[data.language] || data.language.toUpperCase();
+                    
                     // For non-English responses, show both original and translated
                     const messageDiv = document.createElement('div');
                     messageDiv.classList.add('message', 'bot-message');
@@ -470,7 +1246,7 @@
                     // Create the translated text element
                     const translatedDiv = document.createElement('div');
                     translatedDiv.classList.add('translated-text');
-                    translatedDiv.innerHTML = `<strong>${data.language === 'hi' ? 'Hindi' : 'Tamil'}:</strong> ${data.response}`;
+                    translatedDiv.innerHTML = `<strong>${languageName}:</strong> ${data.response}`;
                     
                     // Create the original text element (smaller and lighter)
                     const originalDiv = document.createElement('div');
@@ -559,12 +1335,21 @@
             
             // Function to play audio response
             function playAudioResponse(audioBase64) {
-                const audioData = base64ToArrayBuffer(audioBase64);
-                const audioBlob = new Blob([audioData], { type: 'audio/mp3' });
-                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(`data:audio/mp3;base64,${audioBase64}`);
                 
-                const audio = new Audio(audioUrl);
-                audio.play();
+                // Animate sphere when audio plays
+                const sphere = document.getElementById('animatedSphere');
+                sphere.classList.remove('pulse');
+                sphere.classList.add('speak');
+                
+                audio.onended = function() {
+                    console.log('Audio playback ended');
+                    // Return to pulse animation when audio stops
+                    sphere.classList.remove('speak');
+                    sphere.classList.add('pulse');
+                };
+                
+                audio.play().catch(err => console.error('Error playing audio:', err));
             }
             
             // Helper function to convert base64 to array buffer
@@ -578,6 +1363,32 @@
                 }
                 
                 return bytes.buffer;
+            }
+            
+            // Function to animate the sphere when WALL-E is speaking
+            function animateSphereForSpeech() {
+                const sphere = document.querySelector('.sphere');
+                if (sphere) {
+                    // Remove any existing animation classes
+                    sphere.classList.remove('pulse');
+                    sphere.classList.remove('talking');
+                    
+                    // Force reflow to restart animation
+                    void sphere.offsetWidth;
+                    
+                    // Add talking animation
+                    sphere.classList.add('talking');
+                    
+                    // Create waves around the sphere
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => createWave(), i * 300);
+                    }
+                    
+                    // Remove class after animation completes
+                    setTimeout(() => {
+                        sphere.classList.remove('talking');
+                    }, 2000);
+                }
             }
             
             function sendMessage() {
@@ -617,13 +1428,47 @@
             }
             
             function addMessageToChat(message, sender) {
+                // Create the message element
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('message');
                 messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-                messageDiv.textContent = message;
                 
+                // For HTML content (like system messages with badges)
+                if (message.includes('<') && message.includes('>')) {
+                    messageDiv.innerHTML = message;
+                } else {
+                    messageDiv.textContent = message;
+                }
+                
+                // Add to chat container
                 chatContainer.appendChild(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // If we're in the visual interface, also add to visual chat container
+                const visualChatContainer = document.querySelector('.visual-chat-container');
+                if (visualChatContainer) {
+                    const visualMessageDiv = messageDiv.cloneNode(true);
+                    visualChatContainer.appendChild(visualMessageDiv);
+                    visualChatContainer.scrollTop = visualChatContainer.scrollHeight;
+                    
+                    // If this is a user message, also animate the sphere
+                    if (sender === 'user') {
+                        // Trigger small sphere animation to acknowledge user input
+                        const sphere = document.querySelector('.sphere');
+                        if (sphere) {
+                            sphere.classList.add('pulse');
+                            setTimeout(() => {
+                                sphere.classList.remove('pulse');
+                            }, 500);
+                        }
+                    } else if (sender === 'bot') {
+                        // Trigger the sphere to talk animation
+                        animateSphereForSpeech();
+                    }
+                }
+                
+                // For debugging
+                console.log(`Added ${sender} message: ${message.substring(0, 50)}${message.length > 50 ? '...' : ''}`);
             }
             
             function loadPatientData(patientId) {
@@ -705,6 +1550,58 @@
                 document.getElementById('heartRate').textContent = `${vitals.heart_rate} bpm`;
                 document.getElementById('bloodPressure').textContent = vitals.blood_pressure;
                 document.getElementById('oxygenSaturation').textContent = `${vitals.oxygen_saturation}%`;
+                
+                // Display data source information if available
+                const dataSourceElement = document.getElementById('dataSource');
+                const lastUpdatedElement = document.getElementById('lastUpdated');
+                const conditionContainer = document.getElementById('conditionContainer');
+                const patientConditionElement = document.getElementById('patientCondition');
+                
+                if (vitals.data_source) {
+                    dataSourceElement.textContent = vitals.data_source;
+                    
+                    // Apply appropriate styling based on data source
+                    if (vitals.data_source.includes('Supabase')) {
+                        dataSourceElement.className = 'badge bg-primary';
+                        
+                        // For Supabase data, show the condition if available
+                        if (vitals.condition) {
+                            conditionContainer.style.display = 'block';
+                            patientConditionElement.textContent = vitals.condition.toUpperCase();
+                            
+                            // Apply appropriate styling based on condition
+                            if (vitals.condition === 'normal') {
+                                patientConditionElement.className = 'badge bg-success';
+                            } else if (vitals.condition === 'warning') {
+                                patientConditionElement.className = 'badge bg-warning text-dark';
+                            } else if (vitals.condition === 'critical') {
+                                patientConditionElement.className = 'badge bg-danger';
+                            } else {
+                                patientConditionElement.className = 'badge bg-info';
+                            }
+                        } else {
+                            conditionContainer.style.display = 'none';
+                        }
+                    } else if (vitals.data_source.includes('Error')) {
+                        dataSourceElement.className = 'badge bg-warning text-dark';
+                        conditionContainer.style.display = 'none';
+                    } else {
+                        dataSourceElement.className = 'badge bg-secondary';
+                        conditionContainer.style.display = 'none';
+                    }
+                    
+                    // Display last updated time if available
+                    if (vitals.last_updated) {
+                        lastUpdatedElement.textContent = `Last updated: ${vitals.last_updated}`;
+                    } else {
+                        lastUpdatedElement.textContent = '';
+                    }
+                } else {
+                    dataSourceElement.textContent = 'Simulated Data';
+                    dataSourceElement.className = 'badge bg-secondary';
+                    lastUpdatedElement.textContent = '';
+                    conditionContainer.style.display = 'none';
+                }
                 
                 // Check for concerning vitals and highlight them
                 const tempElement = document.getElementById('temperature').parentElement.parentElement;

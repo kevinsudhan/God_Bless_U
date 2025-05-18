@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify, send_file
-from flask_cors import CORS
 import requests
 import json
 import random
@@ -9,6 +8,7 @@ import speech_recognition as sr
 import pyttsx3
 import threading
 import time
+import datetime
 import base64
 import io
 
@@ -17,13 +17,28 @@ from medical_knowledge import get_medical_knowledge
 from multilingual import get_multilingual_support
 
 app = Flask(__name__)
-CORS(app)
 
 print("Using simplified speech recognition for demo")
 
 tts_engine = pyttsx3.init()
 
 medical_knowledge = get_medical_knowledge()
+
+# Function to fetch data from Supabase
+def fetch_supabase_vitals():
+    supabase_url = "https://wghhrmgntnzudopyvshe.supabase.co/rest/v1/vitals"
+    headers = {
+        "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnaGhybWdudG56dWRvcHl2c2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0Nzc0ODAsImV4cCI6MjA2MzA1MzQ4MH0.n2k0oaI4xD1bIRs4Yu9zkTIQ9uMdeyrizkVodjJlxk8",
+        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndnaGhybWdudG56dWRvcHl2c2hlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0Nzc0ODAsImV4cCI6MjA2MzA1MzQ4MH0.n2k0oaI4xD1bIRs4Yu9zkTIQ9uMdeyrizkVodjJlxk8"
+    }
+    
+    try:
+        response = requests.get(supabase_url, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        print(f"Error fetching data from Supabase: {e}")
+        return []
 
 patients = {
     "P001": {
@@ -45,6 +60,11 @@ patients = {
     "P002": {
         "name": "Emily Johnson",
         "age": 32,
+        "medication_history": [
+            "Started on oral antibiotics for pneumonia on 2025-05-11",
+            "Switched to IV antibiotics on 2025-05-13 due to poor response",
+            "Started on bronchodilators on 2025-05-14"
+        ],
         "gender": "Female",
         "diagnosis": "Pneumonia",
         "admission_date": "2025-05-15",
@@ -73,10 +93,40 @@ patients = {
         "medications": ["Aspirin", "Atorvastatin", "Metoprolol"],
         "allergies": [],
         "medical_history": ["Coronary Artery Disease", "Hyperlipidemia"]
+    },
+    "P004": {
+        "name": "RAHUL",
+        "age": 40,
+        "gender": "Male",
+        "diagnosis": "Real-time Monitoring",
+        "admission_date": "2025-05-17",
+        "vital_signs": {
+            "temperature": 36.8,
+            "heart_rate": 75,
+            "blood_pressure": "120/80",
+            "oxygen_saturation": 97
+        },
+        "medications": ["Vitamin D", "Multivitamin"],
+        "allergies": ["None"],
+        "medical_history": [
+            "Patient with real-time health monitoring",
+            "Remote patient monitoring program",
+            "Wellness assessment"
+        ],
+        "medication_history": [
+            "Started on daily supplements on 2025-05-17"
+        ],
+        "supabase_data": True,  # Flag to indicate this patient uses Supabase data
+        "supabase_patient_id": "P001"  # Actual ID in Supabase
     }
 }
 
+@app.route('/splash')
 @app.route('/')
+def splash():
+    return render_template('splash.html')
+
+@app.route('/main')
 def index():
     return render_template('index.html', patient_ids=list(patients.keys()))
 
@@ -254,18 +304,80 @@ Patient: {user_message}"""
 @app.route('/update_vitals/<patient_id>', methods=['POST'])
 def update_vitals(patient_id):
     if patient_id in patients:
-        patients[patient_id]['vital_signs']['temperature'] = round(
-            patients[patient_id]['vital_signs']['temperature'] + random.uniform(-0.3, 0.3), 1)
-        patients[patient_id]['vital_signs']['heart_rate'] = max(60, min(100, 
-            patients[patient_id]['vital_signs']['heart_rate'] + random.randint(-5, 5)))
-        
-        sys, dia = map(int, patients[patient_id]['vital_signs']['blood_pressure'].split('/'))
-        sys = max(90, min(160, sys + random.randint(-5, 5)))
-        dia = max(60, min(100, dia + random.randint(-3, 3)))
-        patients[patient_id]['vital_signs']['blood_pressure'] = f"{sys}/{dia}"
-        
-        patients[patient_id]['vital_signs']['oxygen_saturation'] = max(90, min(100,
-            patients[patient_id]['vital_signs']['oxygen_saturation'] + random.randint(-2, 2)))
+        # Special handling for Patient 4 (P004) - fetch real-time data from Supabase
+        if patient_id == "P004" and patients[patient_id].get('supabase_data', False):
+            try:
+                # Fetch the latest vitals from Supabase
+                supabase_vitals = fetch_supabase_vitals()
+                
+                if supabase_vitals and len(supabase_vitals) > 0:
+                    # Filter for records matching this patient's Supabase ID
+                    patient_supabase_id = patients[patient_id].get('supabase_patient_id', 'P001')
+                    patient_records = [record for record in supabase_vitals if record.get('patient_id') == patient_supabase_id]
+                    
+                    # Sort by timestamp in descending order to get the most recent
+                    patient_records.sort(key=lambda x: x.get('timestamp', 0), reverse=True)
+                    
+                    if patient_records:
+                        # Use the most recent record
+                        latest_vitals = patient_records[0]
+                        
+                        # Map Supabase fields to our application fields
+                        patients[patient_id]['vital_signs']['heart_rate'] = latest_vitals.get('heart_rate', 75)
+                        patients[patient_id]['vital_signs']['oxygen_saturation'] = latest_vitals.get('spo2', 97)
+                        
+                        # Generate simulated temperature and blood pressure (not in Supabase)
+                        patients[patient_id]['vital_signs']['temperature'] = round(36.5 + (latest_vitals.get('heart_rate', 75) - 70) * 0.02, 1)
+                        
+                        # Calculate systolic and diastolic based on heart rate
+                        hr = latest_vitals.get('heart_rate', 75)
+                        systolic = 110 + int((hr - 70) * 0.5)
+                        diastolic = 70 + int((hr - 70) * 0.3)
+                        patients[patient_id]['vital_signs']['blood_pressure'] = f"{systolic}/{diastolic}"
+                        
+                        # Add condition from Supabase
+                        patients[patient_id]['vital_signs']['condition'] = latest_vitals.get('condition', 'normal')
+                    
+                    # Add timestamp for when the data was fetched
+                    patients[patient_id]['vital_signs']['last_updated'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    patients[patient_id]['vital_signs']['data_source'] = "Supabase Live Data"
+                    
+                    print(f"Updated P004 vitals with Supabase data: {latest_vitals}")
+                else:
+                    print("No Supabase vitals data found, using default values")
+            except Exception as e:
+                print(f"Error fetching Supabase data: {e}")
+                # Fall back to random updates if Supabase fails
+                patients[patient_id]['vital_signs']['temperature'] = round(
+                    patients[patient_id]['vital_signs']['temperature'] + random.uniform(-0.3, 0.3), 1)
+                patients[patient_id]['vital_signs']['heart_rate'] = max(60, min(100, 
+                    patients[patient_id]['vital_signs']['heart_rate'] + random.randint(-5, 5)))
+                
+                sys, dia = map(int, patients[patient_id]['vital_signs']['blood_pressure'].split('/'))
+                sys = max(90, min(160, sys + random.randint(-5, 5)))
+                dia = max(60, min(100, dia + random.randint(-3, 3)))
+                patients[patient_id]['vital_signs']['blood_pressure'] = f"{sys}/{dia}"
+                
+                patients[patient_id]['vital_signs']['oxygen_saturation'] = max(90, min(100,
+                    patients[patient_id]['vital_signs']['oxygen_saturation'] + random.randint(-2, 2)))
+                
+                patients[patient_id]['vital_signs']['data_source'] = "Fallback Random Data (Supabase Error)"
+        else:
+            # Regular random updates for Patients 1-3
+            patients[patient_id]['vital_signs']['temperature'] = round(
+                patients[patient_id]['vital_signs']['temperature'] + random.uniform(-0.3, 0.3), 1)
+            patients[patient_id]['vital_signs']['heart_rate'] = max(60, min(100, 
+                patients[patient_id]['vital_signs']['heart_rate'] + random.randint(-5, 5)))
+            
+            sys, dia = map(int, patients[patient_id]['vital_signs']['blood_pressure'].split('/'))
+            sys = max(90, min(160, sys + random.randint(-5, 5)))
+            dia = max(60, min(100, dia + random.randint(-3, 3)))
+            patients[patient_id]['vital_signs']['blood_pressure'] = f"{sys}/{dia}"
+            
+            patients[patient_id]['vital_signs']['oxygen_saturation'] = max(90, min(100,
+                patients[patient_id]['vital_signs']['oxygen_saturation'] + random.randint(-2, 2)))
+            
+            patients[patient_id]['vital_signs']['data_source'] = "Simulated Random Data"
         
         return jsonify({"status": "success", "vitals": patients[patient_id]['vital_signs']})
     else:
@@ -299,20 +411,33 @@ def text_to_speech(text, language='en'):
         
         print(f"Converting text to speech using Google TTS with language {language}...")
         
-        # Map language code to Google TTS language code
+        # Map language code to Google TTS language code - handling all supported languages
         tts_lang = 'en'
-        if language.startswith('ta'):
-            tts_lang = 'ta'
-        elif language.startswith('hi'):
-            tts_lang = 'hi'
-        elif language.startswith('es'):
-            tts_lang = 'es'
-        elif language.startswith('te'):
-            tts_lang = 'te'
-        elif language.startswith('kn'):
-            tts_lang = 'kn'
         
-        # Create gTTS object and save to in-memory file
+        # Language mapping - focusing on Indian languages as per user's needs
+        language_map = {
+            'ta': 'ta',   # Tamil
+            'hi': 'hi',   # Hindi
+            'te': 'te',   # Telugu
+            'kn': 'kn',   # Kannada
+            'ml': 'ml',   # Malayalam 
+            'bn': 'bn',   # Bengali
+            'gu': 'gu',   # Gujarati
+            'mr': 'mr',   # Marathi
+            'pa': 'pa',   # Punjabi
+            'es': 'es',   # Spanish
+            'fr': 'fr',   # French
+            'de': 'de',   # German
+        }
+        
+        # Get the first 2 characters of language code and find matching TTS language
+        lang_prefix = language[:2].lower()
+        if lang_prefix in language_map:
+            tts_lang = language_map[lang_prefix]
+        
+        print(f"Using Google TTS language code: {tts_lang} for requested language: {language}")
+        
+        # Create gTTS object with appropriate language setting
         tts = gTTS(text=text, lang=tts_lang, slow=False)
         
         # Save to in-memory file object instead of disk
@@ -363,5 +488,6 @@ print("Initializing RAG engine with patient data...")
 rag_engine = get_rag_engine(patients)
 print("RAG engine initialized!")
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+if __name__ == "__main__":
+    # Run app on all network interfaces so it's accessible on other devices
+    app.run(host='0.0.0.0', debug=True, port=5000)

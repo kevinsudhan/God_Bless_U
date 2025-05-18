@@ -482,8 +482,15 @@
             color: white;
         }
         .lang-btn {
-            width: 80px;
-            margin: 0 10px;
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            min-width: 70px; /* Ensure minimum width for all language buttons */
+        }
+        
+        .nowrap {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .translated-text {
             margin-bottom: 5px;
@@ -557,11 +564,11 @@
                             <div class="mt-3 language-selection">
                                 <span class="me-2">Language:</span>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-outline-primary lang-btn active" id="lang-en-visual">English</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-hi-visual">Hindi</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-ta-visual">Tamil</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-te-visual">Telugu</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-kn-visual">Kannada</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn active nowrap" id="lang-en-visual">English</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn nowrap" id="lang-hi-visual">Hindi</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn nowrap" id="lang-ta-visual">Tamil</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn nowrap" id="lang-te-visual">Telugu</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn nowrap" id="lang-kn-visual">Kannada</button>
                                 </div>
                             </div>
                         </div>
@@ -618,11 +625,11 @@
                             <div class="mt-3 language-selection">
                                 <span class="me-2">Language:</span>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-outline-primary lang-btn active" id="lang-en">English</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-hi">Hindi</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-ta">Tamil</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-te">Telugu</button>
-                                    <button type="button" class="btn btn-outline-primary lang-btn" id="lang-kn">Kannada</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn active nowrap" id="lang-en">English</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn nowrap" id="lang-hi">Hindi</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn nowrap" id="lang-ta">Tamil</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn nowrap" id="lang-te">Telugu</button>
+                                    <button type="button" class="btn btn-outline-primary lang-btn nowrap" id="lang-kn">Kannada</button>
                                 </div>
                             </div>
                         </div>

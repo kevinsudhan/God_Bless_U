@@ -251,14 +251,16 @@ Patient: {user_message}"""
     print(f"Generated prompt for {user_role} mode")
     
     try:
-        response = requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "MEDIBOTV1",  
-                "prompt": prompt,
-                "stream": False
-            }
-        )
+        # Make a request to the LLM API with optimized parameters for faster responses
+        response = requests.post("http://localhost:11434/api/generate", json={
+            "model": "MEDIBOTV1",  # Use the correct model name
+            "prompt": prompt,
+            "stream": False,
+            "temperature": 0.7,  # Lower temperature for more focused responses
+            "top_p": 0.9,       # Slightly more focused sampling
+            "top_k": 40,        # Limit vocabulary choices for faster generation
+            "num_predict": 256  # Limit generation length for faster responses
+        })
         
         if response.status_code == 200:
             result = response.json()

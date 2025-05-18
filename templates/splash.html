@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WALL-E</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #2E7D32;
+            --light-green: #4CAF50;
+            --dark-green: #1B5E20;
+            --accent-green: #81C784;
+            --gradient-start: #43A047;
+            --gradient-mid: #2E7D32;
+            --gradient-end: #1B5E20;
+            --gradient-accent: #00C853;
+            --text-light: #FFFFFF;
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+        }
+        
+        .splash-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+            background-size: 300% 300%;
+            animation: gradient-animation 10s ease infinite;
+        }
+        
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .logo-container {
+            position: relative;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.5s;
+        }
+        
+        .logo-container:hover {
+            transform: scale(1.1);
+        }
+        
+        .logo-text {
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--text-light);
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+            letter-spacing: 8px;
+            margin: 0;
+            opacity: 0;
+            animation: text-appear 3s forwards;
+        }
+        
+        .logo-subtext {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            opacity: 0.8;
+            letter-spacing: 3px;
+            margin-top: 10px;
+            opacity: 0;
+            animation: text-appear 3s forwards 0.5s;
+        }
+        
+        @keyframes text-appear {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .glowing-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 60px rgba(66, 179, 104, 0.6);
+            z-index: -1;
+            animation: pulse 2s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+        
+        .enter-button {
+            margin-top: 50px;
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: text-appear 2s forwards 1.5s;
+        }
+        
+        .enter-button:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-container" id="splashContainer">
+        <div class="glowing-circle"></div>
+        <div class="logo-container" id="logoContainer">
+            <h1 class="logo-text">WALL-E</h1>
+            <p class="logo-subtext">HOSPITAL ASSISTANT</p>
+            <button class="enter-button">ENTER</button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create particles
+            const container = document.getElementById('splashContainer');
+            
+            for (let i = 0; i < 50; i++) {
+                createParticle(container);
+            }
+            
+            // Add click event to redirect to main app
+            document.querySelector('.logo-container').addEventListener('click', function() {
+                window.location.href = '/main';
+            });
+            
+            document.querySelector('.enter-button').addEventListener('click', function() {
+                window.location.href = '/main';
+            });
+        });
+        
+        function createParticle(container) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random size between 3 and 8px
+            const size = Math.random() * 5 + 3;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // Random position within the container
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            particle.style.left = `${posX}%`;
+            particle.style.top = `${posY}%`;
+            
+            // Random opacity
+            particle.style.opacity = Math.random() * 0.5 + 0.3;
+            
+            // Add animation with random duration
+            const duration = Math.random() * 10 + 5; // 5-15 seconds
+            particle.style.animation = `float ${duration}s infinite ease-in-out`;
+            
+            // Random floating animation for each particle
+            const keyframes = `
+                @keyframes float {
+                    0% {
+                        transform: translate(0, 0);
+                    }
+                    50% {
+                        transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+                    }
+                    100% {
+                        transform: translate(0, 0);
+                    }
+                }
+            `;
+            
+            const style = document.createElement('style');
+            style.innerHTML = keyframes;
+            document.head.appendChild(style);
+            
+            container.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
